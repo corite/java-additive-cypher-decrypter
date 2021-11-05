@@ -14,7 +14,7 @@ public class FileHandler {
         byte[] bytes = Files.readAllBytes(path);
         ArrayList<Byte> returnArray = new ArrayList<>();
         for (int i=0; i<bytes.length ; i++) {
-            returnArray.add(Byte.valueOf(bytes[i]));
+            returnArray.add(bytes[i]);
         }
         return returnArray;
     }

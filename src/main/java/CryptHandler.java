@@ -1,40 +1,69 @@
-
-
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class CryptHandler {
 
-    public ArrayList<Byte> getDecryptedText(ArrayList<Byte> encryptedText) {
-        HashMap<Byte, Double> byteFrequencyMap = getByteFrequencyMap(encryptedText);
-        Byte space = Byte.valueOf(" ");
-        Byte mostFrequentByte = getMostFrequentByte(byteFrequencyMap);
-        int key = mostFrequentByte-space;
-        return decrypt(encryptedText,key);
+    public ArrayList<Byte> getDecryptedText(ArrayList<Byte> encryptedText, Byte mostFrequentDecryptedByte) {
+        return decrypt(encryptedText,getKey(encryptedText,mostFrequentDecryptedByte));
     }
 
+    public int getKey(ArrayList<Byte> encryptedText, Byte mostFrequentDecryptedByte) {
+        HashMap<Byte, Double> byteFrequencyMap = getByteFrequencyMap(encryptedText);
+
+        Byte mostFrequentEncryptedByte = getMostFrequentByte(byteFrequencyMap);
+        return (mostFrequentEncryptedByte-mostFrequentDecryptedByte+128)%128;
+        //adding 128 before modulo because java thinks p.e -2 % 10 = -2 != 8
+    }
+
+    /**
+     * @param encryptedText the text to analyse
+     * @return a map with each byte of the text as a key and the frequency in which it occurs in the text as value
+     */
     private HashMap<Byte, Double> getByteFrequencyMap(ArrayList<Byte> encryptedText) {
         ArrayList<Byte> distinctBytes = encryptedText.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
+        //gets the distinct bytes from the text, so that we can put it in the frequency-map later
         HashMap<Byte, Double> byteDoubleMap = new HashMap<>();
         for (Byte distinctByte : distinctBytes) {
             long numberOfOccurrences = encryptedText.stream().filter(b -> b.byteValue() == distinctByte.byteValue()).count();
+            //number of times this byte is present in the text
             byteDoubleMap.put(distinctByte, Double.valueOf(numberOfOccurrences)/Double.valueOf(encryptedText.size()));
         }
         return byteDoubleMap;
     }
 
     private LinkedHashMap<Byte,Double> getSortedMap(Map<Byte,Double> unsortedMap) {
+        //didn't end up using this since it was a little "overkill" for the purpose
         return unsortedMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
+
     private Byte getMostFrequentByte(HashMap<Byte, Double> byteFrequencyMap) {
-        LinkedHashMap<Byte,Double> sortedMap =getSortedMap(byteFrequencyMap);
-        return (Byte) sortedMap.entrySet().toArray()[0];
+        return byteFrequencyMap.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                //somehow it sorts it in reverse by default, so I have to reverse the order
+                .map(Map.Entry::getKey)
+                //only look at the Key now
+                .findFirst().get();
+                //get the first entry since it is the most common one
     }
 
-    private ArrayList<Byte> decrypt(ArrayList<Byte> byteArray, int key) {
-        return byteArray.stream().map(b -> b - key).collect(Collectors.toCollection((Supplier<ArrayList>) ArrayList::new));
+    public ArrayList<Byte> decrypt(ArrayList<Byte> byteArray, int key) {
+        ArrayList<Byte> decryptedBytes = new ArrayList<>();
+        for (Byte encByte : byteArray) {
+            decryptedBytes.add(((Integer) (((encByte - key)+128) % 128)).byteValue());
+            //adding 128 before modulo because java thinks p.e -2 % 10 = -2 != 8
+
+        }
+
+        return decryptedBytes;
+    }
+
+    public String asString(ArrayList<Byte> byteArray) {
+        //Convert all bytes to characters end concatenate them to a String
+        return byteArray.stream()
+                .map(Character::toString)
+                .collect(Collectors.joining());
+
     }
 }

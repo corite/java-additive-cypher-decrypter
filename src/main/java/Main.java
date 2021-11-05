@@ -6,14 +6,17 @@ public class Main {
         FileHandler fileHandler = new FileHandler();
         ArrayList<Byte> encryptedBytes = new ArrayList<>();
         try {
-            encryptedBytes = fileHandler.getBytesFromFile("encryptedFile");
+            //read file
+            encryptedBytes = fileHandler.getBytesFromFile("LoremIpsumEncrypted.txt");
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
         CryptHandler cryptHandler = new CryptHandler();
-        ArrayList<Byte> decryptedBytes = cryptHandler.getDecryptedText(encryptedBytes);
-
+        int key = cryptHandler.getKey(encryptedBytes,(byte) ' ');
+        System.out.println("Key: "+key);
+        ArrayList<Byte> decryptedBytes = cryptHandler.decrypt(encryptedBytes,key);
+        System.out.println("Decrypted Text: "+cryptHandler.asString(decryptedBytes));
 
 
     }
