@@ -6,7 +6,7 @@ plugins {
 mainClassName = 'Main'
 
 
-group 'org.example'
+group 'me.corite'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -29,3 +29,4 @@ java {
 test {
     useJUnitPlatform()
 }
+

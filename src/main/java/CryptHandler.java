@@ -3,10 +3,6 @@ import java.util.stream.Collectors;
 
 public class CryptHandler {
 
-    public ArrayList<Byte> getDecryptedText(ArrayList<Byte> encryptedText, Byte mostFrequentDecryptedByte) {
-        return decrypt(encryptedText,getKey(encryptedText,mostFrequentDecryptedByte));
-    }
-
     public int getKey(ArrayList<Byte> encryptedText, Byte mostFrequentDecryptedByte) {
         HashMap<Byte, Double> byteFrequencyMap = getByteFrequencyMap(encryptedText);
 
@@ -31,19 +27,10 @@ public class CryptHandler {
         return byteDoubleMap;
     }
 
-    private LinkedHashMap<Byte,Double> getSortedMap(Map<Byte,Double> unsortedMap) {
-        //didn't end up using this since it was a little "overkill" for the purpose
-        return unsortedMap.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-    }
-
     private Byte getMostFrequentByte(HashMap<Byte, Double> byteFrequencyMap) {
         return byteFrequencyMap.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                //somehow it sorts it in reverse by default, so I have to reverse the order
                 .map(Map.Entry::getKey)
-                //only look at the Key now
                 .findFirst().get();
                 //get the first entry since it is the most common one
     }
@@ -53,7 +40,6 @@ public class CryptHandler {
         for (Byte encByte : byteArray) {
             decryptedBytes.add(((Integer) (((encByte - key)+128) % 128)).byteValue());
             //adding 128 before modulo because java thinks p.e -2 % 10 = -2 != 8
-
         }
 
         return decryptedBytes;
@@ -64,6 +50,5 @@ public class CryptHandler {
         return byteArray.stream()
                 .map(Character::toString)
                 .collect(Collectors.joining());
-
     }
 }
