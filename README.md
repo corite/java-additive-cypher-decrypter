@@ -1,4 +1,4 @@
-# java-additive-cypher-decrypter
+# java-additive-cypher-decrypter [![gradle run](https://github.com/corite/java-additive-cypher-decrypter/actions/workflows/gradle-run.yml/badge.svg)](https://github.com/corite/java-additive-cypher-decrypter/actions/workflows/gradle-run.yml)
 ## Output
 ```
 Key: 53
